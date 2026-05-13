@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        $IMAGE_NAME = "varundocker3/django:v1"
+    }
     stages {
         stage("git clone") {
             steps {
@@ -11,12 +14,18 @@ pipeline {
         stage("build docker image") {
             steps {
                 echo "build image"
-                sh 'docker build -t djangoapp:v1 .'
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
+                sh 'docker build -t $IMAGE_NAME .'
+                }
             }
         }
         stage("push docker image") {
             steps{
                 echo "push image to dockerhub"
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
+                 sh 'docker push $IMAGE_NAME'
+                    }
+                
             }
         }
         stage("deploy comtainer") {
