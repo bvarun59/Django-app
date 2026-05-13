@@ -14,14 +14,16 @@ pipeline {
         stage("login to docker"){
            steps{
             withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
-                sh 'docker login -u $DHUB_USER -p $DHUB_PASS'
+               // sh 'docker login -u $DHUB_USER -p $DHUB_PASS'
+               // this is insecure way of using which prints password in log
+               sh 'echo $DHUB_PASS | docker login -u $DHUB_USER --password-stdin'
                 }
            } 
         }
         stage("build docker image") {
             steps {
                 echo "build image"
-            //withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
+            
                 sh 'docker build -t $IMAGE_NAME .'
                 
             }
@@ -29,9 +31,9 @@ pipeline {
         stage("push docker image") {
             steps{
                 echo "push image to dockerhub"
-              //  withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
+             
                  sh 'docker push $IMAGE_NAME'
-              //      }
+              
                 
             }
         }
