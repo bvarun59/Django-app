@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        $IMAGE_NAME = "varundocker3/django:v1"
+        IMAGE_NAME = "varundocker3/django:v1"
     }
     stages {
         stage("git clone") {
