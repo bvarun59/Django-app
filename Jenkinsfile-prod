@@ -39,18 +39,18 @@ pipeline {
                 
             }
         }
-stage("Deploy container to server from DockerHub") {
+        stage("Deploy container to server from DockerHub") {
          input {
             message "Deploying Docker container to prod. Please confirm to proceed."
             ok "Deploy to prod or stage"
             }
-    steps {
-        withCredentials([
-        sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user'), 
-        usernamePassword(credentialsId: 'Dockerhub-Cred',usernameVariable: 'DHUB_USER',passwordVariable: 'DHUB_PASS' )]) {
+            steps {
+                withCredentials([
+                sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user'), 
+                usernamePassword(credentialsId: 'Dockerhub-Cred',usernameVariable: 'DHUB_USER',passwordVariable: 'DHUB_PASS' )]) {
 
-         sh """
-            ssh -i $ssh_key -o StrictHostKeyChecking=no $ssh_user@$server_ip1 '
+             sh """
+                ssh -i $ssh_key -o StrictHostKeyChecking=no $ssh_user@$server_ip1 '
 
                 echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
 
