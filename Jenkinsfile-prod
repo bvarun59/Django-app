@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         IMAGE_NAME = "varundocker3/django:v1"
+        server_ip1 = "192.168.0.110"
     }
     stages {
         stage("git clone") {
@@ -42,10 +43,11 @@ pipeline {
                 echo "deployed comtainer"
                 withCredentials([sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: '', usernameVariable: 'sshuser')]) {
                 sh '''
-                hostnamectl
+                ssh $sshuser@$server_ip1
                 withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
                sh 'echo $DHUB_PASS | docker login -u $DHUB_USER --password-stdin'
                sh 'docker pull $IMAGE_NAME'
+               }
                '''
                }
             }
