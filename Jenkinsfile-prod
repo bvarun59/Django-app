@@ -9,7 +9,7 @@ pipeline {
            steps{
             withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
                // sh 'docker login -u $DHUB_USER -p $DHUB_PASS'
-               // this is insecure way of using which prints password in log
+               // // this is insecure way of using which prints password in log
                sh 'echo $DHUB_PASS | docker login -u $DHUB_USER --password-stdin'
                 }
            } 
