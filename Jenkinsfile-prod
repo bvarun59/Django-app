@@ -62,9 +62,6 @@ stage("Deploy container to server from DockerHub") {
 
                 docker pull \$IMAGE_NAME
 
-                docker stop mycontainer || true
-                docker rm mycontainer || true
-
                 docker run -d \
                     --name mycontainer \
                     -p 80:80 \
