@@ -3,6 +3,7 @@ pipeline {
     environment {
         IMAGE_NAME = "varundocker3/django:v1"
         server_ip1 = "192.168.0.110"
+        SSH_USER = "varun"
     }
     stages {
         stage("git clone") {
@@ -41,7 +42,7 @@ pipeline {
 stage("Deploy container to server from DockerHub") {
          input {
             message "Deploying Docker container to prod. Please confirm to proceed."
-            ok "Deploy"
+            ok "Deploy to prod or stage"
             }
     steps {
 
