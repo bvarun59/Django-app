@@ -56,18 +56,14 @@ stage("Deploy container to server from DockerHub") {
         ]) {
 
             sh """
-            ssh -i \$SSH_KEY -o StrictHostKeyChecking=no \$SSH_USER@\$server_ip1 '
+            ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@$server_ip1 '
 
-                echo "\$DHUB_PASS" | docker login -u "\$DHUB_USER" --password-stdin
+                echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
 
-                docker pull \$IMAGE_NAME
+                docker pull $IMAGE_NAME
 
-                docker run -d \
-                    --name mycontainer \
-                    -p 80:80 \
-                    \$IMAGE_NAME
-
-            '
+                docker run -d --name mycontainer -p 80:80 $IMAGE_NAME
+                '
             """
         }
     }
