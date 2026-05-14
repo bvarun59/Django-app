@@ -45,7 +45,7 @@ stage("Deploy container to server from DockerHub") {
             ok "Deploy to prod or stage"
             }
     steps {
-        withCredentials([sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: '$ssh_key', usernameVariable: '$ssh_user')]),
+        withCredentials([sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: '$ssh_key', usernameVariable: '$ssh_user'),
 
         withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred',usernameVariable: 'DHUB_USER',passwordVariable: 'DHUB_PASS' )]) {
 
