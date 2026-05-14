@@ -37,9 +37,17 @@ pipeline {
                 
             }
         }
-        stage("deploy comtainer") {
+        stage("deploy comtainer to server from dockerhub") {
             steps{
-                echo "deployed comtainers"
+                echo "deployed comtainer"
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: '', usernameVariable: 'sshuser')]) {
+                sh '''
+                hostnamectl
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
+               sh 'echo $DHUB_PASS | docker login -u $DHUB_USER --password-stdin'
+               sh 'docker pull $IMAGE_NAME'
+               '''
+               }
             }
         }
         
