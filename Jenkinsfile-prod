@@ -65,7 +65,7 @@ stage("Deploy container to server from DockerHub") {
 
                 docker pull $IMAGE_NAME
 
-                docker run -d --name mycontainer -p 1313:80 $IMAGE_NAME
+                docker run -d --name mycontainer -p 1313:8000 $IMAGE_NAME
                 '
             """
         }
