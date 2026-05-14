@@ -46,12 +46,12 @@ pipeline {
 
                 echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
 
-                docker stop mycontainer || true
-                docker rm mycontainer || true
+                docker stop prodmycontainer || true
+                docker rm prodmycontainer || true
 
                 docker pull $IMAGE_NAME
 
-                docker run -d --name mycontainer -p 8000:8000 $IMAGE_NAME
+                docker run -d --name prodmycontainer -p 8000:8000 $IMAGE_NAME
                 '
             """
         }
