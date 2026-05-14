@@ -42,12 +42,12 @@ pipeline {
 
                 echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
 
-                docker stop mycontainer || true
-                docker rm mycontainer || true
+                docker stop featuremycontainer || true
+                docker rm featuremycontainer || true
 
                 docker pull $IMAGE_NAME
 
-                docker run -d --name mycontainer -p 9000:8000 $IMAGE_NAME
+                docker run -d --name featuremycontainer -p 9000:8000 $IMAGE_NAME
                 '
             """
         }
