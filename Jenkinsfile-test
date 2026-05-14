@@ -1,6 +1,10 @@
 pipeline {
-    agent any
-
+    agent {
+        node {
+            label 'microdegree'
+        }
+    }
+    
     environment {
         IMAGE_NAME = "sun113/microdegree"
         IMAGE_TAG = "latest"
@@ -30,7 +34,7 @@ pipeline {
                 }
             }
         }
-        stage("Deploy Docker containers To EC2"){
+        stage("Deploy Docker containers To Production"){
             input {
                 message "Deploying Docker container to EC2 instance. Please confirm to proceed."
                 ok "Deploy"
