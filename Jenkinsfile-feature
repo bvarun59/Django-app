@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = "varundocker3/proddjango:v1"
+        IMAGE_NAME = "varundocker3/featuredjango:v1"
         server_ip1 = "52.91.210.160"
     }
     stages {
@@ -31,11 +31,7 @@ pipeline {
                 
             }
         }
-        stage("Deploy container to server from DockerHub") {
-         input {
-            message "Deploying Docker container to prod. Please confirm to proceed."
-            ok "Deploy to prod or stage"
-            }
+        stage("Deploy container to stage from DockerHub") {
             steps {
                 withCredentials([
                 sshUserPrivateKey(credentialsId: 'ssh-cred-app', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user'), 

@@ -1,10 +1,18 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = "varundocker3/proddjango:v1"
-        server_ip1 = "52.91.210.160"
+        IMAGE_NAME = "varundocker3/django:v1"
+        server_ip1 = "192.168.0.110"
+        //SSH_USER = "varun"
     }
     stages {
+        stage("git clone") {
+            steps {
+                echo "checkout scm"
+            // sh 'git clone https://github.com/bvarun59/Docker.git'
+            }
+            
+        }
         stage("login to docker"){
            steps{
             withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
@@ -38,7 +46,7 @@ pipeline {
             }
             steps {
                 withCredentials([
-                sshUserPrivateKey(credentialsId: 'ssh-cred-app', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user'), 
+                sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user'), 
                 usernamePassword(credentialsId: 'Dockerhub-Cred',usernameVariable: 'DHUB_USER',passwordVariable: 'DHUB_PASS' )]) {
 
              sh """
@@ -51,7 +59,7 @@ pipeline {
 
                 docker pull $IMAGE_NAME
 
-                docker run -d --name mycontainer -p 8000:8000 $IMAGE_NAME
+                docker run -d --name mycontainer -p 1313:8000 $IMAGE_NAME
                 '
             """
         }
