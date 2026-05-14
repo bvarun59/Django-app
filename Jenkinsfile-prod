@@ -3,7 +3,7 @@ pipeline {
     environment {
         IMAGE_NAME = "varundocker3/django:v1"
         server_ip1 = "192.168.0.110"
-        SSH_USER = "varun"
+        //SSH_USER = "varun"
     }
     stages {
         stage("git clone") {
@@ -45,11 +45,12 @@ stage("Deploy container to server from DockerHub") {
             ok "Deploy to prod or stage"
             }
     steps {
+        withCredentials([sshUserPrivateKey(credentialsId: 'ssh-cred-110', keyFileVariable: '$ssh_key', usernameVariable: '$ssh_user')]),
 
         withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred',usernameVariable: 'DHUB_USER',passwordVariable: 'DHUB_PASS' )]) {
 
          sh """
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$server_ip1 '
+            ssh -i $ssh_key -o StrictHostKeyChecking=no $ssh_user@$server_ip1 '
 
                 echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
 
