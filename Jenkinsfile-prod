@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         IMAGE_NAME = "varundocker3/proddjango:v1"
-        server_ip1 = "52.91.210.160"
+        server_ip1 = "34.205.72.238"
     }
     stages {
         stage("login to docker"){
