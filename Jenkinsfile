@@ -1,61 +1,66 @@
 pipeline {
     agent any
-
     environment {
-        IMAGE_NAME = "sun113/django-app"
-        IMAGE_TAG = "latest"
-        CONTAINER = "django-container"
+        IMAGE_NAME = "varundocker3/proddjango:v1"
+        server_ip1 = "52.91.210.160"
     }
     stages {
-        stage(checkout) {
-            steps {
-                checkout scm
-            }
-        }
-        stage ('Build Docker Image') {
-            steps {
-                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
-            }
-        }
-        stage ('Push To Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh "docker push $IMAGE_NAME:$IMAGE_TAG" 
+        stage("login to docker"){
+           steps{
+            withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
+               // sh 'docker login -u $DHUB_USER -p $DHUB_PASS'
+               // // this is insecure way of using which prints password in log
+               sh 'echo $DHUB_PASS | docker login -u $DHUB_USER --password-stdin'
                 }
+           } 
+        }
+        stage("build docker image") {
+            steps {
+                echo "build image"
+            
+                sh 'docker build -t $IMAGE_NAME .'
+                
             }
         }
-        stage ('Deploy to EC2') {
-          steps {
-            sh '''
-                echo "Deploying to EC2..."
-                echo "Pulling latest image from Docker Hub..."
-                docker pull $IMAGE_NAME:$IMAGE_TAG
-
-                echo "Stopping existing container (if any)..."
-                docker stop $CONTAINER || true
-
-                echo "Removing existing container (if any)..."
-                docker rm $CONTAINER || true
-
-                echo "Running new container..."
-                docker run -d --name $CONTAINER -p 8000:8000 $IMAGE_NAME:$IMAGE_TAG
-            '''
-          }
+        stage("push docker image") {
+            steps{
+                echo "push image to dockerhub"
+             
+                 sh 'docker push $IMAGE_NAME'
+              
+                
+            }
         }
-        stage ('Deploy to Kubernetes') {
-          steps {
-            sh '''
-                echo "Deploying to Kubernetes..."
-                echo "Updating Kubernetes deployment with new image..."
-                kubectl apply -f k8s/
-                kubectl set image deployment/django-deployment django=$IMAGE_NAME:$IMAGE_TAG
-            '''
-          }
+        stage("Deploy container to stage server from DockerHub") {
+         when {
+                // Matches branch names starting with 'features'
+                branch 'features/*' 
+            }
+         input {
+            message "Deploying Docker container to prod. Please confirm to proceed."
+            ok "Deploy to prod or stage"
+            }
+            steps {
+                withCredentials([
+                sshUserPrivateKey(credentialsId: 'ssh-cred-app', keyFileVariable: 'ssh_key', usernameVariable: 'ssh_user'), 
+                usernamePassword(credentialsId: 'Dockerhub-Cred',usernameVariable: 'DHUB_USER',passwordVariable: 'DHUB_PASS' )]) {
+
+             sh """
+                ssh -i $ssh_key -o StrictHostKeyChecking=no $ssh_user@$server_ip1 '
+
+                echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
+
+                docker stop prodmycontainer || true
+                docker rm prodmycontainer || true
+
+                docker pull $IMAGE_NAME
+
+                docker run -d --name prodmycontainer -p 8000:8000 $IMAGE_NAME
+                '
+            """
         }
+    }
+}
+        
     }
 }
