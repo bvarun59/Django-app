@@ -34,7 +34,7 @@ pipeline {
         stage("Deploy container to server from DockerHub") {
             when {
                 // Matches branch names starting with 'features'
-                branch 'main/*' 
+                branch 'main' 
             }
             steps {
                 withCredentials([
