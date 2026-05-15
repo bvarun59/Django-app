@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = "varundocker3/featuredjango:v1"
+        IMAGE_NAME = "varundocker3/proddjango:v1"
         server_ip1 = "34.205.72.238"
     }
     stages {
@@ -9,7 +9,7 @@ pipeline {
            steps{
             withCredentials([usernamePassword(credentialsId: 'Dockerhub-Cred', passwordVariable: 'DHUB_PASS', usernameVariable: 'DHUB_USER')]) {
                // sh 'docker login -u $DHUB_USER -p $DHUB_PASS'
-               // this is insecure way of using which prints password in log
+               // // this is insecure way of using which prints password in log
                sh 'echo $DHUB_PASS | docker login -u $DHUB_USER --password-stdin'
                 }
            } 
@@ -32,9 +32,9 @@ pipeline {
             }
         }
         stage("Deploy container to server from DockerHub") {
-         input {
-            message "Deploying Docker container to prod. Please confirm to proceed."
-            ok "Deploy to prod or stage"
+            when {
+                // Matches branch names starting with 'features'
+                branch 'main' 
             }
             steps {
                 withCredentials([
@@ -46,12 +46,12 @@ pipeline {
 
                 echo "$DHUB_PASS" | docker login -u "$DHUB_USER" --password-stdin
 
-                docker stop featuremycontainer || true
-                docker rm featuremycontainer || true
+                docker stop prodmycontainer || true
+                docker rm prodmycontainer || true
 
                 docker pull $IMAGE_NAME
 
-                docker run -d --name featurecontainer -p 9000:8000 $IMAGE_NAME
+                docker run -d --name prodmycontainer -p 8000:8000 $IMAGE_NAME
                 '
             """
         }
